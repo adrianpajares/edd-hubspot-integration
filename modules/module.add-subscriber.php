@@ -1,17 +1,5 @@
 <?php
 
-/* COOKIE THE CURRENT PAGE FOR LANDING PAGE TRACKING */
-
-add_action('wp_footer','edd_hubspot_integration_store_lp_title_in_session');
-function edd_hubspot_integration_store_lp_title_in_session()
-{
-	global $post; 
-	if ($post->post_type=='download')
-	{
-		setcookie('edd-hubspot-page-title', $post->post_title,time()+3600,"/");
-	}
-}
-
 
 /* ADD SUBSCRIBER TO HUBSPOT ON CHECKOUT */
 
@@ -36,7 +24,6 @@ function edd_hubspot_integration_checkout($data)
 	
 	$contacts = new HubSpot_Contacts($edd_settings['edd_hubspot_api_key'] , $edd_settings['edd_hubspot_portal_id']);
 	$lists = new HubSpot_Lists($edd_settings['edd_hubspot_api_key'] ,  $edd_settings['edd_hubspot_portal_id'] );
-	
 
 	/*check if contact exists */
     $contact = $contacts->get_contact_by_email($user_data['email']);
@@ -60,11 +47,19 @@ function edd_hubspot_integration_checkout($data)
 		$contact_id = $createdContact->{'vid'};
 	}
 	
+	echo "contact id: $contact_id <br>";
+	
 	/* loop through cart and add lead to item lists */
 	foreach ($cart_data as $item)
 	{
 		/* check to see if hubspot list id exists for download already */
 		$hubspot_list_id = get_post_meta( $item['id'] , 'edd_hubspot_list_id' , true );
+
+		/* make sure list exists */
+		$list_check = $lists->get_list($hubspot_list_id);
+
+		if (count($list_check->lists)<1)
+			$hubspot_list_id = null;
 
 		if (!$hubspot_list_id)
 		{
@@ -90,7 +85,7 @@ function edd_hubspot_integration_checkout($data)
         $added_contacts = $lists->add_contacts_to_list( $contacts_to_add , $hubspot_list_id );
 
 	}
-	
+
 	return $data;
 
 }
