@@ -47,7 +47,7 @@ function edd_hubspot_integration_checkout($data)
 		$contact_id = $createdContact->{'vid'};
 	}
 	
-	echo "contact id: $contact_id <br>";
+	//echo "contact id: $contact_id <br>";
 	
 	/* loop through cart and add lead to item lists */
 	foreach ($cart_data as $item)
@@ -57,10 +57,11 @@ function edd_hubspot_integration_checkout($data)
 
 		/* make sure list exists */
 		$list_check = $lists->get_list($hubspot_list_id);
-
-		if (count($list_check->lists)<1)
+		
+		if ( !property_exists($list_check , 'lists') || count($list_check->lists)<1)
 			$hubspot_list_id = null;
 
+			
 		if (!$hubspot_list_id)
 		{
 			/* create a contact list */
@@ -74,6 +75,9 @@ function edd_hubspot_integration_checkout($data)
 			
 			$new_list = $lists->create_list($list_data);
 
+			if ( !property_exists( $new_list , 'listId') )
+				var_dump ($new_list); exit;
+				
 			$hubspot_list_id = $new_list->{'listId'};
 			
 			

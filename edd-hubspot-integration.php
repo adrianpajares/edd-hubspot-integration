@@ -1,7 +1,7 @@
 <?php 
 /*
 Plugin Name: Easy Digital Downloads - HubSpot integration
-Plugin URI: https://easydigitaldownloads.com/extension/
+Plugin URI: https://easydigitaldownloads.com/extension/hubspot-integration
 Description: Hubspot lead integration collects helps automatically customer information and input it into Hubspot.com's client management database.
 Version: 1.0.1
 Author: Hudson Atwell
@@ -29,20 +29,13 @@ switch (is_admin()) :
 		/* loads admin files */	
 		include_once('modules/module.extension-setup.php');
 		include_once('modules/module.settings.php');
-		//include_once('modules/module.metaboxes.php');
 		
-		//if (!class_exists('AWeberAPI'))
-			//include_once('includes/aweber_api/aweber_api.php');		
-		
+		BREAK;
 	case false :
 		/* loads frontend files */				
 		include_once('modules/module.add-subscriber.php');
 		
-		//if (!class_exists('AWeberAPI'))
-			//include_once('includes/aweber_api/aweber_api.php');		
-			
+		BREAK;
 endswitch;
 
 
-//echo 1; exit;
-?>

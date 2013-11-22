@@ -1,5 +1,7 @@
 <?php
 
+load_plugin_textdomain('edd-hubspot',false, EDD_HUBSPOT_PATH . '/lang/' );
+
 if( ! class_exists( 'EDD_License' ) )
 	include_once ( EDD_HUBSPOT_PATH . 'includes/EDD_License_Handler.php' );
 		
