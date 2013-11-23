@@ -13,7 +13,7 @@ function edd_hubspot_integration_checkout($data)
 	if (!isset($edd_settings['edd_hubspot_api_key']))
 		return $data;
 	
-	//print_r($edd_settings);
+	
 	
 	require_once EDD_HUBSPOT_PATH.'includes/haPiHP-master/class.lists.php';
 	require_once EDD_HUBSPOT_PATH.'includes/haPiHP-master/class.contacts.php';
@@ -38,6 +38,7 @@ function edd_hubspot_integration_checkout($data)
 		$lead_data = array('email'=> $user_data['email'],
 						'firstname'=> $user_data['first_name'],
 						'lastname'=> $user_data['last_name']
+						//'edd_checkout' => 1
 						);
 		
 		$lead_data = apply_filters('edd_hubspot_lead_data',$lead_data);
@@ -47,21 +48,25 @@ function edd_hubspot_integration_checkout($data)
 		$contact_id = $createdContact->{'vid'};
 	}
 	
-	//echo "contact id: $contact_id <br>";
+
 	
 	/* loop through cart and add lead to item lists */
 	foreach ($cart_data as $item)
 	{
-		/* check to see if hubspot list id exists for download already */
-		$hubspot_list_id = get_post_meta( $item['id'] , 'edd_hubspot_list_id' , true );
-
-		/* make sure list exists */
-		$list_check = $lists->get_list($hubspot_list_id);
+		/* check if list exists */
+		$hubspot_list_id  = null;
+		$static_lists = $lists->get_static_lists($hubspot_list_id);
 		
-		if ( !property_exists($list_check , 'lists') || count($list_check->lists)<1)
-			$hubspot_list_id = null;
+		foreach ($static_lists->lists as $list)
+		{
 
-			
+			if (stristr($list->name , $item['name']) )
+			{
+				$hubspot_list_id  = $list->listId;
+				break;
+			}
+		}
+
 		if (!$hubspot_list_id)
 		{
 			/* create a contact list */
@@ -76,13 +81,20 @@ function edd_hubspot_integration_checkout($data)
 			$new_list = $lists->create_list($list_data);
 
 			if ( !property_exists( $new_list , 'listId') )
-				var_dump ($new_list); exit;
+			{
+				//print_r($edd_settings);
+				//echo $edd_settings['edd_hubspot_api_key'];
+				//var_dump ($new_list);
+				//echo "<br>";
+			}
 				
 			$hubspot_list_id = $new_list->{'listId'};
 			
 			
 			update_post_meta( $item['id'] , 'edd_hubspot_list_id' , $hubspot_list_id );
 		}
+		
+		//echo "list id : $hubspot_list_id";exit;
 		
 		/* add contact to list */
 		$contacts_to_add = array($contact_id);
