@@ -15,6 +15,7 @@ function edd_hubspot_integration_checkout($data)
 	
 	
 	
+	require_once EDD_HUBSPOT_PATH.'includes/haPiHP-master/class.properties.php';
 	require_once EDD_HUBSPOT_PATH.'includes/haPiHP-master/class.lists.php';
 	require_once EDD_HUBSPOT_PATH.'includes/haPiHP-master/class.contacts.php';
 	require_once EDD_HUBSPOT_PATH.'includes/haPiHP-master/class.exception.php';
@@ -22,6 +23,7 @@ function edd_hubspot_integration_checkout($data)
 	$user_data = $data['user_info'];
 	$cart_data = $data['cart_details'];
 	
+	$properties = new HubSpot_Properties($edd_settings['edd_hubspot_api_key'] , $edd_settings['edd_hubspot_portal_id']);
 	$contacts = new HubSpot_Contacts($edd_settings['edd_hubspot_api_key'] , $edd_settings['edd_hubspot_portal_id']);
 	$lists = new HubSpot_Lists($edd_settings['edd_hubspot_api_key'] ,  $edd_settings['edd_hubspot_portal_id'] );
 
@@ -34,21 +36,37 @@ function edd_hubspot_integration_checkout($data)
     }
 	else
 	{
+		/* create property */
+		/*
+		$property_info  = array(
+				'label'=>'EDD Customer',
+				'name'=>'edd_checkout',
+				'description'=>'Easy Digital Downloads Customer',
+                'groupName'=>'conversioninformation',
+				'type'=>'string',
+				'fieldType'=>'text',
+				'formField'=>'true',
+				'displayOrder'=>0 
+              );
+       
+	    $property_info = apply_filters('edd_hubspot_property_info',$property_info);
+	   
+		$new_prop = $properties->create_property('edd_checkout',$property_info);
+		*/
+		
 		/* create contact */
 		$lead_data = array('email'=> $user_data['email'],
 						'firstname'=> $user_data['first_name'],
 						'lastname'=> $user_data['last_name']
-						//'edd_checkout' => 1
+						//,'edd_checkout' => 'true'
 						);
 		
 		$lead_data = apply_filters('edd_hubspot_lead_data',$lead_data);
 		
 		$createdContact = $contacts->create_contact($lead_data);
-
 		$contact_id = $createdContact->{'vid'};
 	}
 	
-
 	
 	/* loop through cart and add lead to item lists */
 	foreach ($cart_data as $item)
@@ -82,10 +100,12 @@ function edd_hubspot_integration_checkout($data)
 
 			if ( !property_exists( $new_list , 'listId') )
 			{
-				//print_r($edd_settings);
-				//echo $edd_settings['edd_hubspot_api_key'];
-				//var_dump ($new_list);
-				//echo "<br>";
+				/*
+				print_r($edd_settings);
+				echo $edd_settings['edd_hubspot_api_key'];
+				var_dump ($new_list);
+				echo "<br>";
+				*/
 			}
 				
 			$hubspot_list_id = $new_list->{'listId'};
@@ -94,7 +114,10 @@ function edd_hubspot_integration_checkout($data)
 			update_post_meta( $item['id'] , 'edd_hubspot_list_id' , $hubspot_list_id );
 		}
 		
-		//echo "list id : $hubspot_list_id";exit;
+		/*
+		echo "contact id : $contact_id <br>";
+		echo "list id : $hubspot_list_id";exit;
+		*/
 		
 		/* add contact to list */
 		$contacts_to_add = array($contact_id);
