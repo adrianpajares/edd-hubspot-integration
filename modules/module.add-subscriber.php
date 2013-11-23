@@ -27,6 +27,32 @@ function edd_hubspot_integration_checkout($data)
 	$contacts = new HubSpot_Contacts($edd_settings['edd_hubspot_api_key'] , $edd_settings['edd_hubspot_portal_id']);
 	$lists = new HubSpot_Lists($edd_settings['edd_hubspot_api_key'] ,  $edd_settings['edd_hubspot_portal_id'] );
 
+	/* create property in hubspot if it hasn't been created yet. */
+	$property_exists = get_option('edd_hubspot_property_added_'.$edd_settings['edd_hubspot_api_key']);
+	
+	if (!$property_exists)
+	{
+		$property_info  = array(
+				'label'=>'EDD Customer',
+				'name'=>'edd_checkout',
+				'description'=>'Easy Digital Downloads Customer',
+				'groupName'=>'conversioninformation',
+				'type'=>'string',
+				'fieldType'=>'text',
+				'formField'=>'false',
+				'displayOrder'=>0 
+			  );
+	   
+		$property_info = apply_filters('edd_hubspot_property_info',$property_info);
+	   
+		$new_prop = $properties->create_property('edd_checkout',$property_info);
+
+		if (property_exists( $new_prop, 'name') )
+		{
+			update_option('edd_hubspot_property_added_'.$edd_settings['edd_hubspot_api_key'] ,true);
+		}
+	}
+
 	/*check if contact exists */
     $contact = $contacts->get_contact_by_email($user_data['email']);
     if (isset($contact->vid))
@@ -35,30 +61,13 @@ function edd_hubspot_integration_checkout($data)
 		$contact_id = $contact->vid;
     }
 	else
-	{
-		/* create property */
-		/*
-		$property_info  = array(
-				'label'=>'EDD Customer',
-				'name'=>'edd_checkout',
-				'description'=>'Easy Digital Downloads Customer',
-                'groupName'=>'conversioninformation',
-				'type'=>'string',
-				'fieldType'=>'text',
-				'formField'=>'true',
-				'displayOrder'=>0 
-              );
-       
-	    $property_info = apply_filters('edd_hubspot_property_info',$property_info);
-	   
-		$new_prop = $properties->create_property('edd_checkout',$property_info);
-		*/
+	{		
 		
 		/* create contact */
 		$lead_data = array('email'=> $user_data['email'],
 						'firstname'=> $user_data['first_name'],
-						'lastname'=> $user_data['last_name']
-						//,'edd_checkout' => 'true'
+						'lastname'=> $user_data['last_name'],
+						'edd_checkout' => 'true'
 						);
 		
 		$lead_data = apply_filters('edd_hubspot_lead_data',$lead_data);
