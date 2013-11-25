@@ -3,15 +3,15 @@
 
 /* ADD SUBSCRIBER TO HUBSPOT ON CHECKOUT */
 
-add_filter('edd_purchase_data_before_gateway','edd_hubspot_integration_checkout');	
-function edd_hubspot_integration_checkout($data)
+add_filter('edd_complete_purchase','edd_hubspot_integration_checkout');	
+function edd_hubspot_integration_checkout($payment_id)
 {	
 
 	/* get hubspot api key */
 	$edd_settings = get_option('edd_settings');
 
 	if (!isset($edd_settings['edd_hubspot_api_key']))
-		return $data;
+		return $purchase_data;
 	
 	
 	
@@ -20,8 +20,12 @@ function edd_hubspot_integration_checkout($data)
 	require_once EDD_HUBSPOT_PATH.'includes/haPiHP-master/class.contacts.php';
 	require_once EDD_HUBSPOT_PATH.'includes/haPiHP-master/class.exception.php';
 	
-	$user_data = $data['user_info'];
-	$cart_data = $data['cart_details'];
+	$payment_meta = edd_get_payment_meta( $payment_id );
+	
+	$user_data = unserialize( $payment_meta['user_info'] );
+	$cart_data = unserialize( $payment_meta['cart_details'] );
+	
+
 	
 	$properties = new HubSpot_Properties($edd_settings['edd_hubspot_api_key'] , $edd_settings['edd_hubspot_portal_id']);
 	$contacts = new HubSpot_Contacts($edd_settings['edd_hubspot_api_key'] , $edd_settings['edd_hubspot_portal_id']);
@@ -134,6 +138,6 @@ function edd_hubspot_integration_checkout($data)
 
 	}
 
-	return $data;
+	return $purchase_data;
 
 }
