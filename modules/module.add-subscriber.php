@@ -3,7 +3,7 @@
 
 /* ADD SUBSCRIBER TO HUBSPOT ON CHECKOUT */
 
-add_filter('edd_complete_purchase','edd_hubspot_integration_checkout');	
+add_action('edd_complete_purchase','edd_hubspot_integration_checkout');	
 function edd_hubspot_integration_checkout($payment_id)
 {	
 
@@ -137,7 +137,5 @@ function edd_hubspot_integration_checkout($payment_id)
         $added_contacts = $lists->add_contacts_to_list( $contacts_to_add , $hubspot_list_id );
 
 	}
-
-	return $purchase_data;
 
 }
