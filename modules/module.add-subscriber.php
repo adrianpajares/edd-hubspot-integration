@@ -14,23 +14,21 @@ function edd_hubspot_integration_checkout($payment_id)
 		return $purchase_data;
 	
 	
-	
 	require_once EDD_HUBSPOT_PATH.'includes/haPiHP-master/class.properties.php';
 	require_once EDD_HUBSPOT_PATH.'includes/haPiHP-master/class.lists.php';
 	require_once EDD_HUBSPOT_PATH.'includes/haPiHP-master/class.contacts.php';
 	require_once EDD_HUBSPOT_PATH.'includes/haPiHP-master/class.exception.php';
-	
-	$payment_meta = edd_get_payment_meta( $payment_id );
-	
-	$user_data = unserialize( $payment_meta['user_info'] );
-	$cart_data = unserialize( $payment_meta['cart_details'] );
-	
 
+	
+	$user_data = edd_get_payment_meta_user_info();
+	$cart_data = edd_get_payment_meta_cart_details();
+	
 	
 	$properties = new HubSpot_Properties($edd_settings['edd_hubspot_api_key'] , $edd_settings['edd_hubspot_portal_id']);
 	$contacts = new HubSpot_Contacts($edd_settings['edd_hubspot_api_key'] , $edd_settings['edd_hubspot_portal_id']);
 	$lists = new HubSpot_Lists($edd_settings['edd_hubspot_api_key'] ,  $edd_settings['edd_hubspot_portal_id'] );
 
+	
 	/* create property in hubspot if it hasn't been created yet. */
 	$property_exists = get_option('edd_hubspot_property_added_'.$edd_settings['edd_hubspot_api_key']);
 	
