@@ -20,8 +20,8 @@ function edd_hubspot_integration_checkout($payment_id)
 	require_once EDD_HUBSPOT_PATH.'includes/haPiHP-master/class.exception.php';
 
 	
-	$user_data = edd_get_payment_meta_user_info();
-	$cart_data = edd_get_payment_meta_cart_details();
+	$user_data = edd_get_payment_meta_user_info($payment_id);
+	$cart_data = edd_get_payment_meta_cart_details($payment_id);
 	
 	
 	$properties = new HubSpot_Properties($edd_settings['edd_hubspot_api_key'] , $edd_settings['edd_hubspot_portal_id']);

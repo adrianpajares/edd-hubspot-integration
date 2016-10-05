@@ -3,7 +3,7 @@
 Plugin Name: Easy Digital Downloads - HubSpot integration
 Plugin URI: https://easydigitaldownloads.com/extension/hubspot-integration
 Description: Hubspot lead integration collects helps automatically customer information and input it into Hubspot.com's client management database.
-Version: 1.0.1
+Version: 1.0.2
 Author: Hudson Atwell
 Author URI: http://www.hudsonatwell.co
 */
@@ -20,7 +20,7 @@ define( 'EDD_HUBSPOT_NAME', 'Hubspot Integration' );
 define( 'EDD_HUBSPOT_SLUG', plugin_basename( dirname(__FILE__) ) );
 define( 'EDD_HUBSPOT_PATH', plugin_dir_path( __FILE__ ) );
 define( 'EDD_HUBSPOT_FILE', __FILE__ );
-define( 'EDD_HUBSPOT_VERSION_NUMBER', '1.0.1' );
+define( 'EDD_HUBSPOT_VERSION_NUMBER', '1.0.2' );
 
 
 /* load core files */
